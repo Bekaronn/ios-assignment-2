@@ -9,7 +9,6 @@ struct Post: Hashable, Equatable {
     // Используем только неизменяемые свойства для хеширования
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
-        hasher.combine(authorId)
     }
     
     // Посты равны, если у них одинаковые id

@@ -1,33 +1,36 @@
 import UIKit
 
 class FeedSystem {
-    // Используем Dictionary для кэша пользователей - O(1) доступ
+    // Кэш пользователей для быстрого доступа (O(1)).
     private var userCache: [UUID: UserProfile] = [:]
     
-    // Используем Array для постов - нужен порядок и частые вставки в начало
+    // Лента постов. Используем массив для сохранения порядка и частых вставок в начало.
     private var feedPosts: [Post] = []
     
-    // Используем Set для хэштегов - быстрый поиск и уникальность
+    // Уникальный набор хэштегов, используется для быстрого поиска.
     private var hashtags: Set<String> = []
     
+    // Добавляет новый пост в ленту.
     func addPost(_ post: Post) {
-        // Добавляем пост в начало ленты
+        // Вставляем пост в начало списка.
         feedPosts.insert(post, at: 0)
         
-        // Извлекаем и добавляем хэштеги
-        let newHashtags = extractHashtags(from: post.content)
-        hashtags.formUnion(newHashtags)
+        // Извлекаем хэштеги из контента и добавляем в общий список.
+        hashtags.formUnion(extractHashtags(from: post.content))
     }
     
+    /// Удаляет пост из ленты.
     func removePost(_ post: Post) {
-        // Удаляем пост из ленты
-        if let index = feedPosts.firstIndex(of: post) {
-            feedPosts.remove(at: index)
-        }
+        // Проверяем, есть ли пост в списке, и удаляем его.
+        feedPosts.removeAll { $0.id == post.id }
     }
     
+    /// Извлекает хэштеги из текста.
     private func extractHashtags(from content: String) -> Set<String> {
-        let words = content.components(separatedBy: .whitespacesAndNewlines)
-        return Set(words.filter { $0.hasPrefix("#") })
+        return Set(content
+            .split { $0.isWhitespace } // Разбиваем текст по пробелам и новым строкам.
+            .filter { $0.hasPrefix("#") } // Оставляем только слова с #
+            .map { String($0) } // Преобразуем Substring в String.
+        )
     }
-} 
+}

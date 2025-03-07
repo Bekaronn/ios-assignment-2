@@ -6,11 +6,13 @@ class FeedViewController: UIViewController {
         tableView.register(FeedItemCell.self, forCellReuseIdentifier: FeedItemCell.identifier)
         tableView.separatorStyle = .none
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.estimatedRowHeight = 750
+        tableView.rowHeight = UITableView.automaticDimension
         return tableView
     }()
     
     private var feedItems: [FeedItem] = []
-    private let feedSystem = FeedSystem()
+    private let refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,18 +20,17 @@ class FeedViewController: UIViewController {
         setupNavigationBar()
         loadMockData()
         
-        // Важно: устанавливаем делегат и источник данных
         tableView.delegate = self
         tableView.dataSource = self
     }
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
-        
-        // Добавляем tableView в иерархию view
         view.addSubview(tableView)
         
-        // Устанавливаем констрейнты
+        refreshControl.addTarget(self, action: #selector(refreshFeed), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -41,16 +42,9 @@ class FeedViewController: UIViewController {
     private func setupNavigationBar() {
         title = "Feed"
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "person.circle"),
-            style: .plain,
-            target: self,
-            action: #selector(profileTapped)
-        )
     }
     
     private func loadMockData() {
-        // Создаем тестовые данные
         let mockPosts = [
             Post(id: UUID(), authorId: UUID(), content: "Enjoying a beautiful sunset! 🌅 #nature #peace", likes: 1234),
             Post(id: UUID(), authorId: UUID(), content: "Just finished my morning workout 💪 #fitness #motivation", likes: 856),
@@ -58,26 +52,20 @@ class FeedViewController: UIViewController {
             Post(id: UUID(), authorId: UUID(), content: "Weekend vibes with friends 🎉 #weekend #friends", likes: 1678)
         ]
         
-        let mockUsers = [
-            UserProfile(id: UUID(), username: "nature_lover", bio: "Living life to the fullest", followers: 1200),
-            UserProfile(id: UUID(), username: "fitness_guru", bio: "Personal trainer & lifestyle coach", followers: 5600),
-            UserProfile(id: UUID(), username: "chef_mike", bio: "Cooking is my passion", followers: 3400),
-            UserProfile(id: UUID(), username: "adventure_time", bio: "Travel | Photography | Life", followers: 2800)
-        ]
+        let placeholderUser = UserProfile(id: UUID(), username: "Anonymous", bio: "", followers: 0)
         
-        feedItems = zip(mockPosts, mockUsers).map { post, user in
-            FeedItem(post: post, author: user)
+        feedItems = mockPosts.map { post in
+            FeedItem(post: post, author: placeholderUser, time: "Just now") // Теперь time поддерживается
         }
         
-        // Перезагружаем таблицу после загрузки данных
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
     }
     
-    @objc private func profileTapped() {
-        let profileVC = UserProfileViewController()
-        navigationController?.pushViewController(profileVC, animated: true)
+    @objc private func refreshFeed() {
+        loadMockData()
+        refreshControl.endRefreshing()
     }
 }
 
@@ -95,13 +83,5 @@ extension FeedViewController: UITableViewDelegate, UITableViewDataSource {
         let feedItem = feedItems[indexPath.row]
         cell.configure(with: feedItem)
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension + 175
-    }
-    
-    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 750
     }
 }

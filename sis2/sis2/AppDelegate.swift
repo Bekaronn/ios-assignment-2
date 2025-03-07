@@ -4,45 +4,53 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        customizeAppearance()
+        configureAppearance()
         return true
     }
     
-    private func customizeAppearance() {
-        // Настройка внешнего вида навигационной панели
-        let navBarAppearance = UINavigationBarAppearance()
-        navBarAppearance.configureWithOpaqueBackground()
-        navBarAppearance.backgroundColor = .systemBackground
-        navBarAppearance.titleTextAttributes = [
+    private func configureAppearance() {
+        setupNavigationBar()
+        setupTabBar()
+    }
+    
+    private func setupNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor.systemBackground
+        appearance.titleTextAttributes = [
             .foregroundColor: UIColor.label,
-            .font: UIFont.systemFont(ofSize: 18, weight: .semibold)
+            .font: UIFont.systemFont(ofSize: 18, weight: .medium)
         ]
-        navBarAppearance.largeTitleTextAttributes = [
+        appearance.largeTitleTextAttributes = [
             .foregroundColor: UIColor.label,
             .font: UIFont.systemFont(ofSize: 34, weight: .bold)
         ]
         
-        UINavigationBar.appearance().standardAppearance = navBarAppearance
-        UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
-        UINavigationBar.appearance().compactAppearance = navBarAppearance
-        UINavigationBar.appearance().tintColor = .systemBlue
+        let navBar = UINavigationBar.appearance()
+        navBar.standardAppearance = appearance
+        navBar.scrollEdgeAppearance = appearance
+        navBar.compactAppearance = appearance
+        navBar.tintColor = UIColor.systemIndigo
+    }
+    
+    private func setupTabBar() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor.tertiarySystemBackground
         
-        // Настройка внешнего вида таб-бара (если используется)
-        let tabBarAppearance = UITabBarAppearance()
-        tabBarAppearance.configureWithOpaqueBackground()
-        tabBarAppearance.backgroundColor = .systemBackground
-        
-        UITabBar.appearance().standardAppearance = tabBarAppearance
-        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+        let tabBar = UITabBar.appearance()
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
+        tabBar.tintColor = UIColor.systemBlue
     }
 
-    // MARK: UISceneSession Lifecycle
-
+    // MARK: - UISceneSession Lifecycle
+    
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+        return UISceneConfiguration(name: "Main Configuration", sessionRole: connectingSceneSession.role)
     }
 
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Вызывается когда пользователь удаляет сцену
+        // Вызывается, когда удаляются неиспользуемые сцены
     }
 }

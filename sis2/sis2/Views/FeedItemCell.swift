@@ -3,92 +3,14 @@ import UIKit
 class FeedItemCell: UITableViewCell {
     static let identifier = "FeedItemCell"
     
-    // UI компоненты
-    private let containerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemBackground
-        view.layer.cornerRadius = 12
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOffset = CGSize(width: 0, height: 2)
-        view.layer.shadowOpacity = 0.1
-        view.layer.shadowRadius = 4
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    private let authorImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 20
-        imageView.clipsToBounds = true
-        imageView.backgroundColor = .systemGray5
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
-    
-    private let usernameLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let contentLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 15)
-        label.numberOfLines = 0
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let likeButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "heart"), for: .normal)
-        button.tintColor = .systemGray2
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    private let likeCountLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.textColor = .secondaryLabel
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let commentButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "message"), for: .normal)
-        button.tintColor = .systemGray2
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    private let shareButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
-        button.tintColor = .systemGray2
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    private let hashtagsLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.textColor = .systemBlue
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let timestampLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = .tertiaryLabel
-        label.textAlignment = .right
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let containerView = UIView()
+    private let usernameLabel = UILabel()
+    private let contentLabel = UILabel()
+    private let likeButton = UIButton(type: .system)
+    private let likeCountLabel = UILabel()
+    private let commentButton = UIButton(type: .system)
+    private let shareButton = UIButton(type: .system)
+    private let hashtagsLabel = UILabel()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -106,8 +28,6 @@ class FeedItemCell: UITableViewCell {
         contentLabel.text = nil
         likeCountLabel.text = nil
         hashtagsLabel.text = nil
-        timestampLabel.text = nil
-        authorImageView.image = nil
         likeButton.setImage(UIImage(systemName: "heart"), for: .normal)
         likeButton.tintColor = .systemGray2
     }
@@ -116,36 +36,60 @@ class FeedItemCell: UITableViewCell {
         backgroundColor = .clear
         selectionStyle = .none
         
+        configureContainerView()
+        configureLabels()
+        configureButtons()
+        setupConstraints()
+    }
+    
+    private func configureContainerView() {
+        containerView.backgroundColor = .systemBackground
+        containerView.layer.cornerRadius = 12
+        containerView.layer.shadowColor = UIColor.black.cgColor
+        containerView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        containerView.layer.shadowOpacity = 0.1
+        containerView.layer.shadowRadius = 4
+        containerView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(containerView)
+    }
+    
+    private func configureLabels() {
+        [usernameLabel, contentLabel, likeCountLabel, hashtagsLabel].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            containerView.addSubview($0)
+        }
         
-        containerView.addSubview(authorImageView)
-        containerView.addSubview(usernameLabel)
-        containerView.addSubview(contentLabel)
-        containerView.addSubview(likeButton)
-        containerView.addSubview(likeCountLabel)
-        containerView.addSubview(commentButton)
-        containerView.addSubview(shareButton)
-        containerView.addSubview(hashtagsLabel)
-        containerView.addSubview(timestampLabel)
+        usernameLabel.font = .boldSystemFont(ofSize: 16)
+        contentLabel.font = .systemFont(ofSize: 15)
+        contentLabel.numberOfLines = 0
+        likeCountLabel.font = .systemFont(ofSize: 14)
+        likeCountLabel.textColor = .secondaryLabel
+        hashtagsLabel.font = .systemFont(ofSize: 14)
+        hashtagsLabel.textColor = .systemBlue
+    }
+    
+    private func configureButtons() {
+        [likeButton, commentButton, shareButton].forEach {
+            $0.tintColor = .systemGray2
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            containerView.addSubview($0)
+        }
         
+        likeButton.setImage(UIImage(systemName: "heart"), for: .normal)
+        commentButton.setImage(UIImage(systemName: "message"), for: .normal)
+        shareButton.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
+    }
+    
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
             
-            authorImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
-            authorImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
-            authorImageView.widthAnchor.constraint(equalToConstant: 40),
-            authorImageView.heightAnchor.constraint(equalToConstant: 40),
-            
             usernameLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
-            usernameLabel.leadingAnchor.constraint(equalTo: authorImageView.trailingAnchor, constant: 12),
-            usernameLabel.trailingAnchor.constraint(equalTo: timestampLabel.leadingAnchor, constant: -8),
-            
-            timestampLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
-            timestampLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
-            timestampLabel.widthAnchor.constraint(equalToConstant: 80),
+            usernameLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
+            usernameLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
             
             contentLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 12),
             contentLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
@@ -183,65 +127,35 @@ class FeedItemCell: UITableViewCell {
     }
     
     @objc private func likeButtonTapped() {
-        // Простая анимация переключения состояния "нравится"
         let wasLiked = likeButton.tintColor == .systemRed
         
         UIView.animate(withDuration: 0.1, animations: {
             self.likeButton.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
         }) { _ in
             UIView.animate(withDuration: 0.1) {
-                self.likeButton.transform = CGAffineTransform.identity
+                self.likeButton.transform = .identity
             }
         }
         
-        if wasLiked {
-            likeButton.setImage(UIImage(systemName: "heart"), for: .normal)
-            likeButton.tintColor = .systemGray2
-        } else {
-            likeButton.setImage(UIImage(systemName: "heart.fill"), for: .normal)
-            likeButton.tintColor = .systemRed
-        }
+        likeButton.setImage(UIImage(systemName: wasLiked ? "heart" : "heart.fill"), for: .normal)
+        likeButton.tintColor = wasLiked ? .systemGray2 : .systemRed
     }
     
-    @objc private func commentButtonTapped() {
-        // Обработчик нажатия кнопки комментария
-    }
+    @objc private func commentButtonTapped() {}
     
-    @objc private func shareButtonTapped() {
-        // Обработчик нажатия кнопки "поделиться"
-    }
+    @objc private func shareButtonTapped() {}
     
-    // Метод конфигурации ячейки с данными
     func configure(with feedItem: FeedItem) {
         usernameLabel.text = feedItem.author.username
         contentLabel.text = feedItem.post.content
         likeCountLabel.text = feedItem.formattedLikes
+        hashtagsLabel.text = extractHashtags(from: feedItem.post.content).joined(separator: " ")
         
-        // Отображение хэштегов синим цветом
-        let hashtags = extractHashtags(from: feedItem.post.content).joined(separator: " ")
-        hashtagsLabel.text = hashtags
-        
-        // Установка случайного цвета для аватара (в реальном приложении здесь была бы загрузка изображения)
-        let colors: [UIColor] = [.systemBlue, .systemGreen, .systemIndigo, .systemOrange, .systemPurple]
-        let randomColor = colors.randomElement() ?? .systemBlue
-        authorImageView.backgroundColor = randomColor
-        
-        // Имитация временной метки
-        timestampLabel.text = "Just now"
-        
-        // Устанавливаем состояние кнопки "нравится"
-        if feedItem.isLiked {
-            likeButton.setImage(UIImage(systemName: "heart.fill"), for: .normal)
-            likeButton.tintColor = .systemRed
-        } else {
-            likeButton.setImage(UIImage(systemName: "heart"), for: .normal)
-            likeButton.tintColor = .systemGray2
-        }
+        likeButton.setImage(UIImage(systemName: feedItem.isLiked ? "heart.fill" : "heart"), for: .normal)
+        likeButton.tintColor = feedItem.isLiked ? .systemRed : .systemGray2
     }
     
-    // Вспомогательный метод для выделения хэштегов
     private func extractHashtags(from text: String) -> [String] {
-        let words = text.components(separatedBy: .whitespacesAndNewlines)
-        return words.filter { $0.hasPrefix("#") }
+        text.split(separator: " ").filter { $0.starts(with: "#") }.map { String($0) }
     }
 }
